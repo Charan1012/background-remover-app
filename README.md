@@ -115,7 +115,7 @@ pipeline {
         }
         stage ("Git checkout") {
             steps {
-                git branch: 'main', url: 'https://github.com/yeshwanthlm/background-remover-python-app.git'
+                git branch: 'main', url: 'https://github.com/Charan1012/background-remover-app.git'
             }
         }
         stage("SonarQube Analysis") {
@@ -153,8 +153,8 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker') {
-                        sh "docker tag background-remover-python-app amonkincloud/background-remover-python-app:latest"
-                        sh "docker push amonkincloud/background-remover-python-app:latest"
+                        sh "docker tag background-remover-python-app emiyacharan/background-remover-python-app:latest"
+                        sh "docker push emiyacharan/background-remover-python-app:latest"
                     }
                 }
             }
@@ -163,43 +163,20 @@ pipeline {
             steps {
                 script {
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                       sh 'docker-scout quickview amonkincloud/background-remover-python-app:latest'
-                       sh 'docker-scout cves amonkincloud/background-remover-python-app:latest'
-                       sh 'docker-scout recommendations amonkincloud/background-remover-python-app:latest'
+                       sh 'docker-scout quickview emiyacharan/background-remover-python-app:latest'
+                       sh 'docker-scout cves emiyacharan/background-remover-python-app:latest'
+                       sh 'docker-scout recommendations emiyacharan/background-remover-python-app:latest'
                    }
                 }
             }
         }
         stage ("Deploy to Container") {
             steps {
-                sh 'docker run -d --name background-remover-python-app -p 5100:5100 amonkincloud/background-remover-python-app:latest'
+                sh 'docker run -d --name background-remover-python-app -p 5100:5100 emiyacharan/background-remover-python-app:latest'
             }
         }
     }
-    post {
-    always {
-        emailext attachLog: true,
-            subject: "'${currentBuild.result}'",
-            body: """
-                <html>
-                <body>
-                    <div style="background-color: #FFA07A; padding: 10px; margin-bottom: 10px;">
-                        <p style="color: white; font-weight: bold;">Project: ${env.JOB_NAME}</p>
-                    </div>
-                    <div style="background-color: #90EE90; padding: 10px; margin-bottom: 10px;">
-                        <p style="color: white; font-weight: bold;">Build Number: ${env.BUILD_NUMBER}</p>
-                    </div>
-                    <div style="background-color: #87CEEB; padding: 10px; margin-bottom: 10px;">
-                        <p style="color: white; font-weight: bold;">URL: ${env.BUILD_URL}</p>
-                    </div>
-                </body>
-                </html>
-            """,
-            to: 'provide_your_Email_id_here',
-            mimeType: 'text/html',
-            attachmentsPattern: 'trivy.txt'
-        }
-    }
+    
 }
 
 ```
